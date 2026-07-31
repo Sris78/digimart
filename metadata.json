@@ -1,0 +1,6 @@
+{
+  "name": "Digital Products Store",
+  "description": "Mobile-first single HTML digital products store with admin management, UPI payment, cart, search, categories, dark mode, and local storage persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

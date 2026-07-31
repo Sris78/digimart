@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Digital Products Store</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 9999px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: rgba(75, 85, 99, 0.5);
+    }
+
+    /* Glassmorphism & Effects */
+    .glass-nav {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Active Animation */
+    .tap-effect {
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .tap-effect:active {
+      transform: scale(0.96);
+    }
+
+    /* Modal Animation */
+    .modal-backdrop {
+      transition: opacity 0.25s ease-out;
+    }
+    .modal-content {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out;
+    }
+
+    /* Toast Animation */
+    @keyframes slideInUp {
+      from {
+        transform: translateY(100%) scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+    .toast-anim {
+      animation: slideInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
+
+  <!-- Mobile Shell Wrapper -->
+  <div class="max-w-md md:max-w-2xl lg:max-w-5xl mx-auto min-h-screen flex flex-col relative pb-24 border-x border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900 shadow-2xl">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 glass-nav border-b border-slate-200/80 dark:border-slate-800/80 px-4 py-3 flex items-center justify-between transition-colors">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-brand-500/20">
+          <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 id="app-title-text" class="font-extrabold text-lg leading-tight tracking-tight text-slate-900 dark:text-white">DigiVault</h1>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span> Instant Digital Store
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Quick Search Toggle -->
+        <button id="quick-search-btn" onclick="switchTab('search')" class="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 tap-effect" title="Search">
+          <i data-lucide="search" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle-btn" onclick="toggleTheme()" class="p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 tap-effect" title="Toggle Theme">
+          <i id="theme-icon" data-lucide="moon" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Header Cart Icon -->
+        <button onclick="switchTab('cart')" class="relative p-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 tap-effect" title="View Cart">
+          <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+          <span id="cart-badge-count" class="hidden absolute top-1 right-1 bg-brand-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900">0</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main View Area -->
+    <main class="flex-1 px-4 py-4 space-y-5">
+
+      <!-- ================= 1. SHOP VIEW ================= -->
+      <section id="view-shop" class="space-y-5">
+        <!-- Promotional Banner -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 p-5 text-white shadow-lg shadow-brand-500/15">
+          <div class="relative z-10 space-y-2 max-w-[85%]">
+            <span class="inline-block px-2.5 py-0.5 rounded-full bg-white/20 text-[11px] font-semibold tracking-wide backdrop-blur-sm">Premium Digital Goods</span>
+            <h2 class="text-xl font-bold leading-tight">Instant Downloads, Lifetime Access</h2>
+            <p class="text-xs text-indigo-100 opacity-90">E-books, Source Code, Audio, Video Assets & Software Templates.</p>
+          </div>
+          <div class="absolute -right-4 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="absolute right-3 bottom-3 opacity-20 text-white">
+            <i data-lucide="download-cloud" class="w-24 h-24"></i>
+          </div>
+        </div>
+
+        <!-- Categories horizontal bar -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-slate-100">Categories</h3>
+            <button onclick="switchTab('search')" class="text-xs text-brand-600 dark:text-brand-400 font-semibold hover:underline">View All</button>
+          </div>
+          <div id="category-chips" class="flex gap-2 overflow-x-auto no-scrollbar pb-1 pt-1">
+            <!-- Rendered via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Search & Filter Quick Bar -->
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input id="shop-search-input" type="text" placeholder="Search eBooks, software, templates..." 
+              oninput="handleShopSearch(this.value)"
+              class="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 transition" />
+            <button id="clear-search-btn" onclick="clearShopSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Sort Selector -->
+          <select id="shop-sort-select" onchange="handleSortChange(this.value)" class="text-xs px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-none focus:ring-2 focus:ring-brand-500 font-medium">
+            <option value="newest">Newest</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="popular">Most Popular</option>
+          </select>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <span>Featured Products</span>
+              <span id="product-count-badge" class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 text-[11px] font-semibold">0</span>
+            </h3>
+          </div>
+
+          <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Rendered via JavaScript -->
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ================= 2. SEARCH & FILTER VIEW ================= -->
+      <section id="view-search" class="hidden space-y-4">
+        <div class="space-y-1">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Explore & Filter</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Find digital files by category, price, or product type.</p>
+        </div>
+
+        <div class="bg-slate-100 dark:bg-slate-800/60 p-3.5 rounded-2xl space-y-3 border border-slate-200/50 dark:border-slate-800">
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input id="explore-search-input" type="text" placeholder="Type keywords..." oninput="handleExploreSearch(this.value)"
+              class="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1">Product Type</label>
+              <select id="filter-type-select" onchange="handleTypeFilterChange(this.value)" class="w-full p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+                <option value="all">All Types</option>
+                <option value="PDF">PDF</option>
+                <option value="Video">Video</option>
+                <option value="Audio">Audio</option>
+                <option value="ZIP">ZIP File</option>
+                <option value="Document">Document</option>
+                <option value="Software">Software</option>
+                <option value="eBook">eBook</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1">Category</label>
+              <select id="filter-category-select" onchange="handleCategoryFilterChange(this.value)" class="w-full p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+                <option value="all">All Categories</option>
+                <!-- Rendered dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Price Range Filter -->
+          <div class="space-y-1 pt-1">
+            <div class="flex justify-between text-[11px] text-slate-600 dark:text-slate-400 font-medium">
+              <span>Max Price:</span>
+              <span id="price-range-value" class="font-bold text-brand-600 dark:text-brand-400">₹2,000</span>
+            </div>
+            <input id="price-range-input" type="range" min="0" max="2000" step="50" value="2000" oninput="handlePriceRangeChange(this.value)" 
+              class="w-full accent-brand-600 cursor-pointer h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg" />
+          </div>
+        </div>
+
+        <div id="search-results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Rendered via JavaScript -->
+        </div>
+      </section>
+
+
+      <!-- ================= 3. CART VIEW ================= -->
+      <section id="view-cart" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Shopping Cart</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Review items before instant checkout</p>
+          </div>
+          <button onclick="clearCart()" id="clear-cart-btn" class="hidden text-xs text-rose-500 hover:text-rose-600 font-medium flex items-center gap-1">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear Cart
+          </button>
+        </div>
+
+        <div id="cart-items-container" class="space-y-3">
+          <!-- Rendered via JavaScript -->
+        </div>
+
+        <!-- Cart Summary & Checkout -->
+        <div id="cart-summary-card" class="hidden bg-slate-100 dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3">
+          <div class="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+            <div class="flex justify-between">
+              <span>Subtotal</span>
+              <span id="cart-subtotal" class="font-semibold">₹0</span>
+            </div>
+            <div class="flex justify-between text-emerald-600 dark:text-emerald-400">
+              <span>Digital Delivery Fee</span>
+              <span class="font-semibold">FREE</span>
+            </div>
+            <div class="border-t border-slate-200 dark:border-slate-700 pt-2 flex justify-between text-sm font-bold text-slate-900 dark:text-white">
+              <span>Total Amount</span>
+              <span id="cart-total" class="text-brand-600 dark:text-brand-400 text-base">₹0</span>
+            </div>
+          </div>
+
+          <!-- Direct Payment Method Notice -->
+          <div class="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 flex items-start gap-2">
+            <i data-lucide="shield-check" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5"></i>
+            <span>Pay securely using UPI ID (<strong id="cart-upi-display">honeyswe331@okaxis</strong>) or payment gateway link for instant automatic product unlock!</span>
+          </div>
+
+          <button onclick="openCheckoutModal()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-sm shadow-lg shadow-brand-500/25 tap-effect flex items-center justify-center gap-2">
+            <i data-lucide="zap" class="w-4 h-4"></i> Proceed to Checkout
+          </button>
+        </div>
+      </section>
+
+
+      <!-- ================= 4. FAVORITES VIEW ================= -->
+      <section id="view-favorites" class="hidden space-y-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Saved Favorites</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Your bookmarked digital items for quick access.</p>
+        </div>
+
+        <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Rendered via JavaScript -->
+        </div>
+      </section>
+
+
+      <!-- ================= 5. MY PURCHASES VIEW ================= -->
+      <section id="view-purchases" class="hidden space-y-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">My Purchases</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Access and download your unlocked digital products anytime.</p>
+        </div>
+
+        <div id="purchases-container" class="space-y-3">
+          <!-- Rendered via JavaScript -->
+        </div>
+      </section>
+
+
+      <!-- ================= 6. ADMIN VIEW ================= -->
+      <section id="view-admin" class="hidden space-y-5">
+        <!-- Admin Auth Gate -->
+        <div id="admin-auth-container" class="bg-slate-100 dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 max-w-sm mx-auto text-center space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-brand-600/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mx-auto">
+            <i data-lucide="lock" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Admin Dashboard Access</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Default password: <code class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-brand-600 dark:text-brand-400 font-mono">admin123</code></p>
+          </div>
+          <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+            <input id="admin-pass-input" type="password" placeholder="Enter Password" required 
+              class="w-full px-3 py-2.5 text-xs text-center rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500" />
+            <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs tap-effect">
+              Unlock Admin Panel
+            </button>
+          </form>
+        </div>
+
+        <!-- Admin Dashboard Content (Hidden until authenticated) -->
+        <div id="admin-dashboard-container" class="hidden space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>Admin Control Panel</span>
+                <span class="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-full">Active</span>
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Manage products, UPI settings, and store backup.</p>
+            </div>
+            <button onclick="handleAdminLogout()" class="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 tap-effect">
+              Logout
+            </button>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-3 gap-2">
+            <div class="p-3 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-center">
+              <span class="text-[10px] font-semibold text-slate-400 block">Total Items</span>
+              <span id="stat-total-products" class="text-base font-bold text-brand-600 dark:text-brand-400">0</span>
+            </div>
+            <div class="p-3 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-center">
+              <span class="text-[10px] font-semibold text-slate-400 block">Total Orders</span>
+              <span id="stat-total-orders" class="text-base font-bold text-emerald-600 dark:text-emerald-400">0</span>
+            </div>
+            <div class="p-3 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-center">
+              <span class="text-[10px] font-semibold text-slate-400 block">Est. Revenue</span>
+              <span id="stat-total-revenue" class="text-base font-bold text-purple-600 dark:text-purple-400">₹0</span>
+            </div>
+          </div>
+
+          <!-- Admin Tabs Header -->
+          <div class="flex border-b border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-500">
+            <button onclick="switchAdminTab('products')" id="admin-tab-products" class="px-4 py-2 border-b-2 border-brand-600 text-brand-600 dark:text-brand-400 font-bold">
+              Products
+            </button>
+            <button onclick="switchAdminTab('settings')" id="admin-tab-settings" class="px-4 py-2 border-b-2 border-transparent hover:text-slate-700 dark:hover:text-slate-300">
+              Payment & Settings
+            </button>
+            <button onclick="switchAdminTab('backup')" id="admin-tab-backup" class="px-4 py-2 border-b-2 border-transparent hover:text-slate-700 dark:hover:text-slate-300">
+              Backup & Data
+            </button>
+          </div>
+
+          <!-- Admin Tab 1: Product Management -->
+          <div id="admin-sec-products" class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-sm text-slate-800 dark:text-slate-200">Catalog Items</h3>
+              <button onclick="openProductModal()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 tap-effect shadow-md shadow-brand-500/20">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add New Product
+              </button>
+            </div>
+
+            <div id="admin-products-list" class="space-y-2">
+              <!-- Rendered via JavaScript -->
+            </div>
+          </div>
+
+          <!-- Admin Tab 2: Settings -->
+          <div id="admin-sec-settings" class="hidden space-y-4 bg-slate-100 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Store Configuration</h3>
+            
+            <form onsubmit="saveStoreSettings(event)" class="space-y-3">
+              <div>
+                <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Default UPI ID (for QR & Direct Pay)</label>
+                <input id="setting-upi-id" type="text" value="honeyswe331@okaxis" required
+                  class="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-mono text-xs" />
+                <p class="text-[10px] text-slate-400 mt-0.5">Default set to <code class="text-brand-600">honeyswe331@okaxis</code>. Used for generating dynamic UPI QR codes during checkout.</p>
+              </div>
+
+              <div>
+                <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Store Name</label>
+                <input id="setting-store-name" type="text" value="DigiVault" required
+                  class="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs" />
+              </div>
+
+              <div>
+                <label class="block font-medium text-slate-600 dark:text-slate-300 mb-1">Change Admin Password</label>
+                <input id="setting-admin-pass" type="text" value="admin123" required
+                  class="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-mono text-xs" />
+              </div>
+
+              <button type="submit" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl tap-effect">
+                Save Settings
+              </button>
+            </form>
+          </div>
+
+          <!-- Admin Tab 3: Backup & JSON Import/Export -->
+          <div id="admin-sec-backup" class="hidden space-y-4 bg-slate-100 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs">
+            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Data Import & Export</h3>
+            <p class="text-slate-500 dark:text-slate-400">Manage all store products, settings, and orders locally in JSON format.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button onclick="exportDataJSON()" class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-500 text-left tap-effect flex items-center gap-3">
+                <i data-lucide="download" class="w-5 h-5 text-brand-600 shrink-0"></i>
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-200">Export JSON</div>
+                  <div class="text-[10px] text-slate-400">Download store catalog as .json file</div>
+                </div>
+              </button>
+
+              <label class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-500 text-left tap-effect flex items-center gap-3 cursor-pointer">
+                <i data-lucide="upload" class="w-5 h-5 text-emerald-600 shrink-0"></i>
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-200">Import JSON</div>
+                  <div class="text-[10px] text-slate-400">Restore store from a JSON file</div>
+                </div>
+                <input type="file" accept=".json" onchange="importDataJSON(event)" class="hidden" />
+              </label>
+            </div>
+
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <button onclick="resetToSeedProducts()" class="text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Reset to Sample Products
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md md:max-w-2xl lg:max-w-5xl z-30 bg-white/90 dark:bg-slate-900/90 glass-nav border-t border-slate-200 dark:border-slate-800 px-2 py-2">
+      <div class="flex items-center justify-around text-slate-500 dark:text-slate-400">
+        <button onclick="switchTab('shop')" id="nav-btn-shop" class="nav-item flex flex-col items-center gap-0.5 p-1.5 text-brand-600 dark:text-brand-400 font-bold tap-effect">
+          <i data-lucide="store" class="w-5 h-5"></i>
+          <span class="text-[10px]">Shop</span>
+        </button>
+
+        <button onclick="switchTab('search')" id="nav-btn-search" class="nav-item flex flex-col items-center gap-0.5 p-1.5 tap-effect">
+          <i data-lucide="compass" class="w-5 h-5"></i>
+          <span class="text-[10px]">Explore</span>
+        </button>
+
+        <button onclick="switchTab('cart')" id="nav-btn-cart" class="nav-item relative flex flex-col items-center gap-0.5 p-1.5 tap-effect">
+          <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+          <span class="text-[10px]">Cart</span>
+          <span id="nav-cart-badge" class="hidden absolute top-0.5 right-2 bg-brand-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+        </button>
+
+        <button onclick="switchTab('favorites')" id="nav-btn-favorites" class="nav-item relative flex flex-col items-center gap-0.5 p-1.5 tap-effect">
+          <i data-lucide="heart" class="w-5 h-5"></i>
+          <span class="text-[10px]">Saved</span>
+          <span id="nav-fav-badge" class="hidden absolute top-0.5 right-2 bg-rose-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+        </button>
+
+        <button onclick="switchTab('purchases')" id="nav-btn-purchases" class="nav-item flex flex-col items-center gap-0.5 p-1.5 tap-effect">
+          <i data-lucide="folder-down" class="w-5 h-5"></i>
+          <span class="text-[10px]">Purchases</span>
+        </button>
+
+        <button onclick="switchTab('admin')" id="nav-btn-admin" class="nav-item flex flex-col items-center gap-0.5 p-1.5 tap-effect">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+          <span class="text-[10px]">Admin</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. Product Detail Modal -->
+  <div id="modal-product-detail" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm modal-backdrop">
+    <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 modal-content">
+      
+      <!-- Modal Header Image -->
+      <div class="relative h-56 bg-slate-100 dark:bg-slate-800 shrink-0">
+        <img id="detail-img" src="" alt="" class="w-full h-full object-cover" />
+        <button onclick="closeModal('modal-product-detail')" class="absolute top-3 right-3 p-2 rounded-full bg-slate-900/60 text-white hover:bg-slate-900 tap-effect">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <span id="detail-type-badge" class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-brand-600 text-white text-xs font-bold shadow-md">PDF</span>
+      </div>
+
+      <!-- Modal Body Content -->
+      <div class="p-5 overflow-y-auto space-y-4 flex-1">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <span id="detail-category" class="text-[11px] font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">E-Books</span>
+            <h2 id="detail-title" class="text-xl font-extrabold text-slate-900 dark:text-white leading-tight mt-0.5">Product Title</h2>
+          </div>
+          <div class="text-right shrink-0">
+            <div id="detail-price" class="text-xl font-black text-slate-900 dark:text-white">₹299</div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="prose prose-sm dark:prose-invert">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">About this item</h4>
+          <p id="detail-description" class="text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+            Description goes here...
+          </p>
+        </div>
+
+        <!-- Details Info Box -->
+        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 space-y-2 text-xs">
+          <div class="flex justify-between text-slate-600 dark:text-slate-400">
+            <span>Delivery Format:</span>
+            <span id="detail-format-text" class="font-semibold text-slate-900 dark:text-slate-100">Instant Download</span>
+          </div>
+          <div class="flex justify-between text-slate-600 dark:text-slate-400">
+            <span>License:</span>
+            <span class="font-semibold text-slate-900 dark:text-slate-100">Personal & Commercial</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer CTA -->
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex items-center gap-2">
+        <button id="detail-fav-btn" onclick="toggleFavoriteFromDetail()" class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 tap-effect">
+          <i id="detail-fav-icon" data-lucide="heart" class="w-5 h-5"></i>
+        </button>
+
+        <button id="detail-share-btn" onclick="shareCurrentProduct()" class="p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 tap-effect" title="Share Product">
+          <i data-lucide="share-2" class="w-5 h-5"></i>
+        </button>
+
+        <button id="detail-add-cart-btn" onclick="addCurrentToCart()" class="flex-1 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-xl text-xs tap-effect flex items-center justify-center gap-1.5">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i> Add to Cart
+        </button>
+
+        <button id="detail-buy-btn" onclick="buyCurrentProductDirect()" class="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs tap-effect shadow-md shadow-brand-500/25 flex items-center justify-center gap-1.5">
+          <i data-lucide="zap" class="w-4 h-4"></i> Buy Now
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- 2. Add/Edit Product Modal (Admin) -->
+  <div id="modal-product-form" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm modal-backdrop">
+    <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 modal-content">
+      <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 id="product-modal-title" class="font-bold text-base text-slate-900 dark:text-white">Add New Product</h3>
+        <button onclick="closeModal('modal-product-form')" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="product-edit-form" onsubmit="handleSaveProduct(event)" class="p-5 overflow-y-auto space-y-3 text-xs flex-1">
+        <input type="hidden" id="form-product-id" />
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Product Title *</label>
+          <input type="text" id="form-title" required placeholder="e.g. Mastering React 2026 eBook"
+            class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Price (₹) *</label>
+            <input type="number" id="form-price" required min="0" placeholder="299"
+              class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Type *</label>
+            <select id="form-type" required class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100">
+              <option value="PDF">PDF Document</option>
+              <option value="eBook">eBook</option>
+              <option value="Software">Software/Code</option>
+              <option value="Video">Video Course</option>
+              <option value="Audio">Audio Pack</option>
+              <option value="ZIP">ZIP Bundle</option>
+              <option value="Document">Document</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Category *</label>
+          <input type="text" id="form-category" required placeholder="e.g. E-Books, Templates, Courses"
+            class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100" />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Thumbnail Image URL or Local Upload</label>
+          <div class="flex gap-2">
+            <input type="url" id="form-thumbnail-url" placeholder="https://..."
+              class="flex-1 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100" />
+            <label class="px-3 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl cursor-pointer hover:bg-slate-300 dark:hover:bg-slate-700 text-[11px] shrink-0 flex items-center gap-1">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload
+              <input type="file" accept="image/*" onchange="handleThumbnailUpload(event)" class="hidden" />
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Description *</label>
+          <textarea id="form-description" rows="3" required placeholder="Describe what the buyer gets..."
+            class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">External File Download Link * (Google Drive, Dropbox, Mega, etc.)</label>
+          <input type="url" id="form-download-url" required placeholder="https://drive.google.com/..."
+            class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100" />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Custom Payment Link (Optional - Stripe/Gumroad/PayPal/Razorpay)</label>
+          <input type="url" id="form-payment-url" placeholder="https://buy.stripe.com/..."
+            class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100" />
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs tap-effect">
+            Save Product
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 3. Checkout / Payment Modal -->
+  <div id="modal-checkout" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm modal-backdrop">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl p-5 space-y-4 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 class="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="qr-code" class="w-5 h-5 text-brand-600"></i> UPI Checkout
+        </h3>
+        <button onclick="closeModal('modal-checkout')" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Item info -->
+      <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs space-y-1">
+        <div class="flex justify-between font-semibold text-slate-700 dark:text-slate-200">
+          <span>Order Item(s):</span>
+          <span id="checkout-item-count">1 Item</span>
+        </div>
+        <div class="flex justify-between font-bold text-slate-900 dark:text-white text-sm">
+          <span>Total Payable:</span>
+          <span id="checkout-total-amount" class="text-brand-600 dark:text-brand-400">₹299</span>
+        </div>
+      </div>
+
+      <!-- QR Code Display -->
+      <div class="text-center space-y-2 py-1">
+        <div class="inline-block p-3 bg-white rounded-2xl shadow-inner border border-slate-200 dark:border-slate-700">
+          <img id="upi-qr-image" src="" alt="UPI QR Code" class="w-48 h-48 mx-auto" />
+        </div>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400">Scan using PhonePe, Google Pay, Paytm, or BHIM</p>
+      </div>
+
+      <!-- UPI ID Copy Box -->
+      <div class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+        <div class="flex-1 truncate font-mono text-xs font-bold text-slate-800 dark:text-slate-200" id="checkout-upi-id">
+          honeyswe331@okaxis
+        </div>
+        <button onclick="copyUpiId()" class="px-2.5 py-1 bg-brand-600 text-white text-[11px] font-bold rounded-lg hover:bg-brand-700 tap-effect shrink-0 flex items-center gap-1">
+          <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
+        </button>
+      </div>
+
+      <!-- Direct UPI Link Button -->
+      <a id="direct-upi-link" href="#" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 tap-effect text-center">
+        <i data-lucide="smartphone" class="w-4 h-4"></i> Open in UPI App
+      </a>
+
+      <!-- Confirm Payment Button -->
+      <div class="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        <p class="text-[10px] text-center text-slate-400">Paid? Click below to confirm transaction and unlock your files immediately.</p>
+        <button onclick="confirmCheckoutPayment()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs tap-effect shadow-md shadow-brand-500/20 flex items-center justify-center gap-2">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Confirm Payment & Unlock Downloads
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-xs space-y-2 pointer-events-none px-4"></div>
+
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* ================= DEFAULT SEED DATA ================= */
+    const DEFAULT_PRODUCTS = [
+      {
+        id: 'prod-1',
+        title: 'Ultimate SaaS React & Tailwind Starter Kit',
+        price: 499,
+        category: 'Software',
+        type: 'ZIP',
+        thumbnail: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80',
+        description: 'Production-ready full-stack SaaS boilerplate with user authentication, dark mode, Stripe billing integration, and responsive layout templates.',
+        downloadUrl: 'https://drive.google.com/file/d/sample-saas-kit/view',
+        paymentUrl: '',
+        createdAt: Date.now() - 100000
+      },
+      {
+        id: 'prod-2',
+        title: 'Mastering Full-Stack AI Development 2026',
+        price: 299,
+        category: 'E-Books',
+        type: 'eBook',
+        thumbnail: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
+        description: 'Complete guide to building LLM applications using Gemini 2.5, LangChain, and modern Web APIs. Includes code snippets and architecture diagrams.',
+        downloadUrl: 'https://drive.google.com/file/d/sample-ebook/view',
+        paymentUrl: '',
+        createdAt: Date.now() - 200000
+      },
+      {
+        id: 'prod-3',
+        title: 'Lo-Fi Chill & Royalty-Free Music Pack Vol. 1',
+        price: 199,
+        category: 'Audio',
+        type: 'Audio',
+        thumbnail: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80',
+        description: '15 soothing lo-fi tracks and 50+ ambient sound effect WAV files for podcasting, YouTube videos, and game backgrounds.',
+        downloadUrl: 'https://drive.google.com/file/d/sample-audio-pack/view',
+        paymentUrl: '',
+        createdAt: Date.now() - 300000
+      },
+      {
+        id: 'prod-4',
+        title: '4K Cinematic LUTs & Color Grading Assets',
+        price: 349,
+        category: 'Video Assets',
+        type: 'ZIP',
+        thumbnail: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=600&q=80',
+        description: 'Professional color grading presets for Premiere Pro, DaVinci Resolve, and Final Cut Pro. Designed for filmmakers and content creators.',
+        downloadUrl: 'https://drive.google.com/file/d/sample-luts/view',
+        paymentUrl: '',
+        createdAt: Date.now() - 400000
+      },
+      {
+        id: 'prod-5',
+        title: 'Financial Planner & Budgeting Excel Dashboard',
+        price: 149,
+        category: 'Templates',
+        type: 'Document',
+        thumbnail: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80',
+        description: 'Automated personal finance tracker in Excel & Google Sheets. Track savings, monthly investments, debts, and expense analytics.',
+        downloadUrl: 'https://drive.google.com/file/d/sample-excel/view',
+        paymentUrl: '',
+        createdAt: Date.now() - 500000
+      },
+      {
+        id: 'prod-6',
+        title: 'Modern Mobile UI Kit (Figma Design File)',
+        price: 399,
+        category: 'Design',
+        type: 'ZIP',
+        thumbnail: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=600&q=80',
+        description: '100+ high-fidelity mobile app screens in Figma with auto-layout v5, dark/light variants, and interactive component libraries.',
+        downloadUrl: 'https://drive.google.com/file/d/sample-figma/view',
+        paymentUrl: '',
+        createdAt: Date.now() - 600000
+      }
+    ];
+
+    /* ================= GLOBAL APP STATE ================= */
+    let AppState = {
+      products: [],
+      cart: [], // [{ productId, quantity }]
+      favorites: [], // [productId]
+      purchases: [], // [{ orderId, productId, price, date, paymentMethod }]
+      settings: {
+        upiId: 'honeyswe331@okaxis',
+        storeName: 'DigiVault',
+        adminPassword: 'admin123'
+      },
+      theme: 'light',
+      activeTab: 'shop',
+      activeCategory: 'all',
+      searchQuery: '',
+      sortBy: 'newest',
+      maxPrice: 2000,
+      typeFilter: 'all',
+      adminLoggedIn: false,
+      selectedProductForDetail: null,
+      checkoutContext: null // { items: [], total: 0 }
+    };
+
+    /* ================= INITIALIZATION ================= */
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStateFromLocalStorage();
+      initTheme();
+      renderAll();
+      lucide.createIcons();
+    });
+
+    function loadStateFromLocalStorage() {
+      try {
+        const savedProducts = localStorage.getItem('dp_products');
+        AppState.products = savedProducts ? JSON.parse(savedProducts) : DEFAULT_PRODUCTS;
+
+        const savedCart = localStorage.getItem('dp_cart');
+        AppState.cart = savedCart ? JSON.parse(savedCart) : [];
+
+        const savedFavs = localStorage.getItem('dp_favorites');
+        AppState.favorites = savedFavs ? JSON.parse(savedFavs) : [];
+
+        const savedPurchases = localStorage.getItem('dp_purchases');
+        AppState.purchases = savedPurchases ? JSON.parse(savedPurchases) : [];
+
+        const savedSettings = localStorage.getItem('dp_settings');
+        if (savedSettings) {
+          AppState.settings = { ...AppState.settings, ...JSON.parse(savedSettings) };
+        }
+
+        const savedTheme = localStorage.getItem('dp_theme');
+        if (savedTheme) {
+          AppState.theme = savedTheme;
+        }
+      } catch (e) {
+        console.error('Error loading state from LocalStorage:', e);
+        AppState.products = DEFAULT_PRODUCTS;
+      }
+    }
+
+    function saveStateToLocalStorage() {
+      localStorage.setItem('dp_products', JSON.stringify(AppState.products));
+      localStorage.setItem('dp_cart', JSON.stringify(AppState.cart));
+      localStorage.setItem('dp_favorites', JSON.stringify(AppState.favorites));
+      localStorage.setItem('dp_purchases', JSON.stringify(AppState.purchases));
+      localStorage.setItem('dp_settings', JSON.stringify(AppState.settings));
+      localStorage.setItem('dp_theme', AppState.theme);
+    }
+
+    /* ================= THEME MANAGER ================= */
+    function initTheme() {
+      if (AppState.theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('theme-icon').setAttribute('data-lucide', 'moon');
+      }
+    }
+
+    function toggleTheme() {
+      AppState.theme = AppState.theme === 'dark' ? 'light' : 'dark';
+      saveStateToLocalStorage();
+      initTheme();
+      lucide.createIcons();
+      showToast(`Switched to ${AppState.theme} mode`, 'info');
+    }
+
+    /* ================= RENDER LOGIC ================= */
+    function renderAll() {
+      updateAppTitle();
+      renderCategories();
+      renderProductsGrid();
+      renderCartView();
+      renderFavoritesView();
+      renderPurchasesView();
+      renderAdminView();
+      updateBadges();
+      lucide.createIcons();
+    }
+
+    function updateAppTitle() {
+      document.getElementById('app-title-text').innerText = AppState.settings.storeName || 'DigiVault';
+      document.getElementById('cart-upi-display').innerText = AppState.settings.upiId || 'honeyswe331@okaxis';
+      document.getElementById('checkout-upi-id').innerText = AppState.settings.upiId || 'honeyswe331@okaxis';
+    }
+
+    function updateBadges() {
+      const cartCount = AppState.cart.reduce((sum, item) => sum + item.quantity, 0);
+      const cartBadge = document.getElementById('cart-badge-count');
+      const navCartBadge = document.getElementById('nav-cart-badge');
+      
+      if (cartCount > 0) {
+        cartBadge.innerText = cartCount;
+        cartBadge.classList.remove('hidden');
+        navCartBadge.innerText = cartCount;
+        navCartBadge.classList.remove('hidden');
+      } else {
+        cartBadge.classList.add('hidden');
+        navCartBadge.classList.add('hidden');
+      }
+
+      const favBadge = document.getElementById('nav-fav-badge');
+      if (AppState.favorites.length > 0) {
+        favBadge.innerText = AppState.favorites.length;
+        favBadge.classList.remove('hidden');
+      } else {
+        favBadge.classList.add('hidden');
+      }
+    }
+
+    /* ================= CATEGORIES ================= */
+    function renderCategories() {
+      const categories = ['all', ...new Set(AppState.products.map(p => p.category))];
+      const chipsContainer = document.getElementById('category-chips');
+      const filterSelect = document.getElementById('filter-category-select');
+
+      chipsContainer.innerHTML = categories.map(cat => {
+        const isActive = AppState.activeCategory === cat;
+        const displayName = cat === 'all' ? 'All Goods' : cat;
+        return `
+          <button onclick="selectCategory('${cat}')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all tap-effect ${
+            isActive 
+              ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20' 
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+          }">
+            ${displayName}
+          </button>
+        `;
+      }).join('');
+
+      filterSelect.innerHTML = categories.map(cat => `
+        <option value="${cat}" ${AppState.activeCategory === cat ? 'selected' : ''}>
+          ${cat === 'all' ? 'All Categories' : cat}
+        </option>
+      `).join('');
+    }
+
+    function selectCategory(cat) {
+      AppState.activeCategory = cat;
+      renderCategories();
+      renderProductsGrid();
+      lucide.createIcons();
+    }
+
+    /* ================= PRODUCT FILTERING & RENDERING ================= */
+    function getFilteredProducts() {
+      return AppState.products.filter(product => {
+        // Category
+        if (AppState.activeCategory !== 'all' && product.category !== AppState.activeCategory) {
+          return false;
+        }
+        // Product Type
+        if (AppState.typeFilter !== 'all' && product.type !== AppState.typeFilter) {
+          return false;
+        }
+        // Price Range
+        if (product.price > AppState.maxPrice) {
+          return false;
+        }
+        // Search Query
+        if (AppState.searchQuery.trim() !== '') {
+          const q = AppState.searchQuery.toLowerCase();
+          const matchTitle = product.title.toLowerCase().includes(q);
+          const matchDesc = product.description.toLowerCase().includes(q);
+          const matchCat = product.category.toLowerCase().includes(q);
+          if (!matchTitle && !matchDesc && !matchCat) return false;
+        }
+        return true;
+      }).sort((a, b) => {
+        if (AppState.sortBy === 'price-low') return a.price - b.price;
+        if (AppState.sortBy === 'price-high') return b.price - a.price;
+        if (AppState.sortBy === 'popular') return b.title.length - a.title.length;
+        return b.createdAt - a.createdAt; // newest
+      });
+    }
+
+    function renderProductsGrid() {
+      const filtered = getFilteredProducts();
+      const grid = document.getElementById('products-grid');
+      const searchGrid = document.getElementById('search-results-grid');
+      const countBadge = document.getElementById('product-count-badge');
+
+      countBadge.innerText = filtered.length;
+
+      if (filtered.length === 0) {
+        const emptyHtml = `
+          <div class="col-span-full py-12 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+              <i data-lucide="package-open" class="w-6 h-6"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-500">No products found matching your criteria</p>
+            <button onclick="resetFilters()" class="text-xs text-brand-600 font-bold hover:underline">Reset Filters</button>
+          </div>
+        `;
+        grid.innerHTML = emptyHtml;
+        searchGrid.innerHTML = emptyHtml;
+        return;
+      }
+
+      const productCardsHtml = filtered.map(p => createProductCardHtml(p)).join('');
+      grid.innerHTML = productCardsHtml;
+      searchGrid.innerHTML = productCardsHtml;
+    }
+
+    function createProductCardHtml(p) {
+      const isFav = AppState.favorites.includes(p.id);
+      return `
+        <div class="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 flex flex-col">
+          <!-- Thumbnail Container -->
+          <div class="relative h-44 bg-slate-100 dark:bg-slate-800 overflow-hidden cursor-pointer" onclick="openProductDetail('${p.id}')">
+            <img src="${p.thumbnail}" alt="${p.title}" loading="lazy" 
+              onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80';"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            
+            <span class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-lg bg-slate-900/70 text-white text-[10px] font-bold backdrop-blur-md uppercase tracking-wider">
+              ${p.type}
+            </span>
+
+            <button onclick="event.stopPropagation(); toggleFavorite('${p.id}')" 
+              class="absolute top-2.5 right-2.5 p-2 rounded-full bg-white/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200 backdrop-blur-md hover:bg-white dark:hover:bg-slate-900 tap-effect">
+              <i data-lucide="heart" class="w-4 h-4 ${isFav ? 'fill-rose-500 text-rose-500' : ''}"></i>
+            </button>
+          </div>
+
+          <!-- Card Content -->
+          <div class="p-3.5 flex flex-col flex-1 justify-between space-y-2">
+            <div>
+              <span class="text-[10px] font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">${p.category}</span>
+              <h4 onclick="openProductDetail('${p.id}')" class="font-bold text-xs text-slate-900 dark:text-white line-clamp-2 mt-0.5 cursor-pointer hover:text-brand-600 dark:hover:text-brand-400">
+                ${p.title}
+              </h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-1">
+                ${p.description}
+              </p>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div class="text-sm font-extrabold text-slate-900 dark:text-white">
+                ₹${p.price}
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <button onclick="addToCart('${p.id}')" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold tap-effect" title="Add to Cart">
+                  <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="openCheckoutSingle('${p.id}')" class="px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold tap-effect shadow-sm">
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* ================= SEARCH & SORT EVENT HANDLERS ================= */
+    function handleShopSearch(val) {
+      AppState.searchQuery = val;
+      const clearBtn = document.getElementById('clear-search-btn');
+      if (val.trim()) clearBtn.classList.remove('hidden');
+      else clearBtn.classList.add('hidden');
+      renderProductsGrid();
+      lucide.createIcons();
+    }
+
+    function clearShopSearch() {
+      document.getElementById('shop-search-input').value = '';
+      handleShopSearch('');
+    }
+
+    function handleExploreSearch(val) {
+      AppState.searchQuery = val;
+      renderProductsGrid();
+      lucide.createIcons();
+    }
+
+    function handleSortChange(val) {
+      AppState.sortBy = val;
+      renderProductsGrid();
+      lucide.createIcons();
+    }
+
+    function handleTypeFilterChange(val) {
+      AppState.typeFilter = val;
+      renderProductsGrid();
+      lucide.createIcons();
+    }
+
+    function handleCategoryFilterChange(val) {
+      AppState.activeCategory = val;
+      renderCategories();
+      renderProductsGrid();
+      lucide.createIcons();
+    }
+
+    function handlePriceRangeChange(val) {
+      AppState.maxPrice = Number(val);
+      document.getElementById('price-range-value').innerText = `₹${val}`;
+      renderProductsGrid();
+      lucide.createIcons();
+    }
+
+    function resetFilters() {
+      AppState.activeCategory = 'all';
+      AppState.typeFilter = 'all';
+      AppState.searchQuery = '';
+      AppState.maxPrice = 2000;
+      AppState.sortBy = 'newest';
+      document.getElementById('shop-search-input').value = '';
+      document.getElementById('explore-search-input').value = '';
+      document.getElementById('price-range-input').value = 2000;
+      document.getElementById('price-range-value').innerText = '₹2,000';
+      renderAll();
+    }
+
+    /* ================= FAVORITES ================= */
+    function toggleFavorite(prodId) {
+      const idx = AppState.favorites.indexOf(prodId);
+      if (idx > -1) {
+        AppState.favorites.splice(idx, 1);
+        showToast('Removed from favorites', 'info');
+      } else {
+        AppState.favorites.push(prodId);
+        showToast('Saved to favorites!', 'success');
+      }
+      saveStateToLocalStorage();
+      renderAll();
+    }
+
+    function renderFavoritesView() {
+      const favProducts = AppState.products.filter(p => AppState.favorites.includes(p.id));
+      const grid = document.getElementById('favorites-grid');
+
+      if (favProducts.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-500 flex items-center justify-center mx-auto">
+              <i data-lucide="heart-off" class="w-6 h-6"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-500">No saved favorites yet</p>
+            <button onclick="switchTab('shop')" class="text-xs text-brand-600 font-bold hover:underline">Explore Products</button>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = favProducts.map(p => createProductCardHtml(p)).join('');
+    }
+
+    /* ================= CART MANAGEMENT ================= */
+    function addToCart(prodId) {
+      const existing = AppState.cart.find(item => item.productId === prodId);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        AppState.cart.push({ productId: prodId, quantity: 1 });
+      }
+      saveStateToLocalStorage();
+      updateBadges();
+      showToast('Added to cart!', 'success');
+      renderCartView();
+    }
+
+    function updateCartQty(prodId, delta) {
+      const item = AppState.cart.find(i => i.productId === prodId);
+      if (!item) return;
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        AppState.cart = AppState.cart.filter(i => i.productId !== prodId);
+      }
+      saveStateToLocalStorage();
+      updateBadges();
+      renderCartView();
+    }
+
+    function clearCart() {
+      AppState.cart = [];
+      saveStateToLocalStorage();
+      updateBadges();
+      renderCartView();
+      showToast('Cart cleared', 'info');
+    }
+
+    function renderCartView() {
+      const container = document.getElementById('cart-items-container');
+      const summaryCard = document.getElementById('cart-summary-card');
+      const clearBtn = document.getElementById('clear-cart-btn');
+
+      if (AppState.cart.length === 0) {
+        container.innerHTML = `
+          <div class="py-16 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+              <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-500">Your shopping cart is empty</p>
+            <button onclick="switchTab('shop')" class="px-4 py-2 bg-brand-600 text-white font-bold rounded-xl text-xs tap-effect">
+              Start Shopping
+            </button>
+          </div>
+        `;
+        summaryCard.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        return;
+      }
+
+      clearBtn.classList.remove('hidden');
+      summaryCard.classList.remove('hidden');
+
+      let subtotal = 0;
+
+      container.innerHTML = AppState.cart.map(item => {
+        const prod = AppState.products.find(p => p.id === item.productId);
+        if (!prod) return '';
+        const itemTotal = prod.price * item.quantity;
+        subtotal += itemTotal;
+
+        return `
+          <div class="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex items-center gap-3">
+            <img src="${prod.thumbnail}" alt="" class="w-14 h-14 rounded-xl object-cover shrink-0 bg-slate-100" 
+              onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80';" />
+            
+            <div class="flex-1 min-w-0">
+              <h4 class="font-bold text-xs text-slate-900 dark:text-white truncate">${prod.title}</h4>
+              <span class="text-[10px] text-slate-400 font-medium">${prod.type} • ₹${prod.price}</span>
+              <div class="font-extrabold text-xs text-brand-600 dark:text-brand-400 mt-0.5">₹${itemTotal}</div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+              <button onclick="updateCartQty('${prod.id}', -1)" class="w-6 h-6 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs font-bold hover:bg-slate-200">
+                -
+              </button>
+              <span class="text-xs font-bold px-1 text-slate-900 dark:text-white">${item.quantity}</span>
+              <button onclick="updateCartQty('${prod.id}', 1)" class="w-6 h-6 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs font-bold hover:bg-slate-200">
+                +
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('cart-subtotal').innerText = `₹${subtotal}`;
+      document.getElementById('cart-total').innerText = `₹${subtotal}`;
+      lucide.createIcons();
+    }
+
+    /* ================= CHECKOUT & UPI PAYMENT ================= */
+    function openCheckoutSingle(prodId) {
+      const prod = AppState.products.find(p => p.id === prodId);
+      if (!prod) return;
+      
+      // Check if product has custom payment URL (Stripe / Gumroad / etc)
+      if (prod.paymentUrl && prod.paymentUrl.trim().length > 5) {
+        window.open(prod.paymentUrl, '_blank');
+        showToast('Opening custom payment page...', 'info');
+        return;
+      }
+
+      AppState.checkoutContext = {
+        items: [{ productId: prod.id, quantity: 1, price: prod.price }],
+        total: prod.price
+      };
+      showCheckoutModal();
+    }
+
+    function openCheckoutModal() {
+      if (AppState.cart.length === 0) return;
+      let total = 0;
+      const items = AppState.cart.map(item => {
+        const prod = AppState.products.find(p => p.id === item.productId);
+        const price = prod ? prod.price : 0;
+        total += price * item.quantity;
+        return { productId: item.productId, quantity: item.quantity, price };
+      });
+
+      AppState.checkoutContext = { items, total };
+      showCheckoutModal();
+    }
+
+    function showCheckoutModal() {
+      const upiId = AppState.settings.upiId || 'honeyswe331@okaxis';
+      const amount = AppState.checkoutContext.total;
+      
+      document.getElementById('checkout-item-count').innerText = `${AppState.checkoutContext.items.length} Item(s)`;
+      document.getElementById('checkout-total-amount').innerText = `₹${amount}`;
+
+      // Generate UPI QR Code URL via Google Chart / QuickChart API
+      const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(AppState.settings.storeName)}&am=${amount}&cu=INR`;
+      const qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(upiString)}&size=250&margin=1`;
+      
+      document.getElementById('upi-qr-image').src = qrUrl;
+      document.getElementById('direct-upi-link').href = upiString;
+
+      openModal('modal-checkout');
+    }
+
+    function copyUpiId() {
+      const upiId = AppState.settings.upiId || 'honeyswe331@okaxis';
+      navigator.clipboard.writeText(upiId);
+      showToast('UPI ID Copied to Clipboard!', 'success');
+    }
+
+    function confirmCheckoutPayment() {
+      if (!AppState.checkoutContext) return;
+
+      const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+      AppState.checkoutContext.items.forEach(item => {
+        // Prevent duplicate purchase record if already exists
+        const exists = AppState.purchases.find(p => p.productId === item.productId);
+        if (!exists) {
+          AppState.purchases.push({
+            orderId: orderId,
+            productId: item.productId,
+            price: item.price,
+            date: Date.now(),
+            paymentMethod: 'UPI (' + AppState.settings.upiId + ')'
+          });
+        }
+      });
+
+      // Clear cart
+      AppState.cart = [];
+      saveStateToLocalStorage();
+      updateBadges();
+
+      closeModal('modal-checkout');
+      showToast('Payment confirmed! Files unlocked.', 'success');
+      switchTab('purchases');
+    }
+
+    /* ================= PURCHASES / DOWNLOADS VIEW ================= */
+    function renderPurchasesView() {
+      const container = document.getElementById('purchases-container');
+
+      if (AppState.purchases.length === 0) {
+        container.innerHTML = `
+          <div class="py-16 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+              <i data-lucide="folder-lock" class="w-6 h-6"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-500">No purchases found</p>
+            <p class="text-[11px] text-slate-400">Buy products or simulate payment to access download links.</p>
+            <button onclick="switchTab('shop')" class="px-4 py-2 bg-brand-600 text-white font-bold rounded-xl text-xs tap-effect">
+              Browse Store
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = AppState.purchases.map(purchase => {
+        const prod = AppState.products.find(p => p.id === purchase.productId);
+        if (!prod) return '';
+
+        const dateStr = new Date(purchase.date).toLocaleDateString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric'
+        });
+
+        return `
+          <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex gap-3">
+                <img src="${prod.thumbnail}" alt="" class="w-12 h-12 rounded-xl object-cover shrink-0 bg-slate-100" />
+                <div>
+                  <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <i data-lucide="check-circle" class="w-3 h-3"></i> Unlocked
+                  </span>
+                  <h4 class="font-bold text-xs text-slate-900 dark:text-white mt-0.5">${prod.title}</h4>
+                  <span class="text-[10px] text-slate-400">Order: ${purchase.orderId} • ${dateStr}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300">₹${purchase.price}</span>
+              <a href="${prod.downloadUrl}" target="_blank" rel="noopener noreferrer" 
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs tap-effect flex items-center gap-1.5 shadow-sm">
+                <i data-lucide="download" class="w-4 h-4"></i> Download File
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    /* ================= PRODUCT DETAIL MODAL ================= */
+    function openProductDetail(prodId) {
+      const prod = AppState.products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      AppState.selectedProductForDetail = prod;
+
+      document.getElementById('detail-img').src = prod.thumbnail;
+      document.getElementById('detail-title').innerText = prod.title;
+      document.getElementById('detail-category').innerText = prod.category;
+      document.getElementById('detail-type-badge').innerText = prod.type;
+      document.getElementById('detail-price').innerText = `₹${prod.price}`;
+      document.getElementById('detail-description').innerText = prod.description;
+      document.getElementById('detail-format-text').innerText = `${prod.type} File • Direct Link`;
+
+      const isFav = AppState.favorites.includes(prod.id);
+      const favIcon = document.getElementById('detail-fav-icon');
+      if (isFav) {
+        favIcon.className = 'w-5 h-5 fill-rose-500 text-rose-500';
+      } else {
+        favIcon.className = 'w-5 h-5 text-slate-600 dark:text-slate-300';
+      }
+
+      openModal('modal-product-detail');
+      lucide.createIcons();
+    }
+
+    function toggleFavoriteFromDetail() {
+      if (!AppState.selectedProductForDetail) return;
+      toggleFavorite(AppState.selectedProductForDetail.id);
+      openProductDetail(AppState.selectedProductForDetail.id);
+    }
+
+    function addCurrentToCart() {
+      if (!AppState.selectedProductForDetail) return;
+      addToCart(AppState.selectedProductForDetail.id);
+      closeModal('modal-product-detail');
+    }
+
+    function buyCurrentProductDirect() {
+      if (!AppState.selectedProductForDetail) return;
+      closeModal('modal-product-detail');
+      openCheckoutSingle(AppState.selectedProductForDetail.id);
+    }
+
+    function shareCurrentProduct() {
+      if (!AppState.selectedProductForDetail) return;
+      if (navigator.share) {
+        navigator.share({
+          title: AppState.selectedProductForDetail.title,
+          text: `Check out ${AppState.selectedProductForDetail.title} on ${AppState.settings.storeName}!`,
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        showToast('Product link copied to clipboard!', 'info');
+      }
+    }
+
+    /* ================= ADMIN MANAGEMENT ================= */
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const pass = document.getElementById('admin-pass-input').value;
+      if (pass === AppState.settings.adminPassword) {
+        AppState.adminLoggedIn = true;
+        renderAdminView();
+        showToast('Admin access granted', 'success');
+      } else {
+        showToast('Incorrect password!', 'error');
+      }
+    }
+
+    function handleAdminLogout() {
+      AppState.adminLoggedIn = false;
+      document.getElementById('admin-pass-input').value = '';
+      renderAdminView();
+      showToast('Logged out from admin', 'info');
+    }
+
+    function renderAdminView() {
+      const authContainer = document.getElementById('admin-auth-container');
+      const dashContainer = document.getElementById('admin-dashboard-container');
+
+      if (!AppState.adminLoggedIn) {
+        authContainer.classList.remove('hidden');
+        dashContainer.classList.add('hidden');
+        return;
+      }
+
+      authContainer.classList.add('hidden');
+      dashContainer.classList.remove('hidden');
+
+      // Stats
+      document.getElementById('stat-total-products').innerText = AppState.products.length;
+      document.getElementById('stat-total-orders').innerText = AppState.purchases.length;
+      const totalRev = AppState.purchases.reduce((sum, p) => sum + p.price, 0);
+      document.getElementById('stat-total-revenue').innerText = `₹${totalRev}`;
+
+      // Settings Inputs
+      document.getElementById('setting-upi-id').value = AppState.settings.upiId || 'honeyswe331@okaxis';
+      document.getElementById('setting-store-name').value = AppState.settings.storeName || 'DigiVault';
+      document.getElementById('setting-admin-pass').value = AppState.settings.adminPassword || 'admin123';
+
+      // Admin Product List
+      const listContainer = document.getElementById('admin-products-list');
+      if (AppState.products.length === 0) {
+        listContainer.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">No products in catalog.</div>`;
+        return;
+      }
+
+      listContainer.innerHTML = AppState.products.map(p => `
+        <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2.5 truncate pr-2">
+            <img src="${p.thumbnail}" alt="" class="w-10 h-10 rounded-lg object-cover bg-slate-100 shrink-0" />
+            <div class="truncate">
+              <div class="font-bold text-slate-900 dark:text-white truncate">${p.title}</div>
+              <div class="text-[10px] text-slate-400">${p.category} • ₹${p.price}</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 shrink-0">
+            <button onclick="openProductModal('${p.id}')" class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="deleteProduct('${p.id}')" class="p-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function switchAdminTab(sec) {
+      ['products', 'settings', 'backup'].forEach(tab => {
+        document.getElementById(`admin-sec-${tab}`).classList.add('hidden');
+        const btn = document.getElementById(`admin-tab-${tab}`);
+        btn.classList.remove('border-brand-600', 'text-brand-600', 'dark:text-brand-400', 'font-bold');
+        btn.classList.add('border-transparent');
+      });
+
+      document.getElementById(`admin-sec-${sec}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`admin-tab-${sec}`);
+      activeBtn.classList.remove('border-transparent');
+      activeBtn.classList.add('border-brand-600', 'text-brand-600', 'dark:text-brand-400', 'font-bold');
+    }
+
+    /* ================= ADD / EDIT PRODUCT ================= */
+    function openProductModal(prodId = null) {
+      const modalTitle = document.getElementById('product-modal-title');
+      const form = document.getElementById('product-edit-form');
+      form.reset();
+
+      if (prodId) {
+        const p = AppState.products.find(item => item.id === prodId);
+        if (p) {
+          modalTitle.innerText = 'Edit Product';
+          document.getElementById('form-product-id').value = p.id;
+          document.getElementById('form-title').value = p.title;
+          document.getElementById('form-price').value = p.price;
+          document.getElementById('form-type').value = p.type;
+          document.getElementById('form-category').value = p.category;
+          document.getElementById('form-thumbnail-url').value = p.thumbnail;
+          document.getElementById('form-description').value = p.description;
+          document.getElementById('form-download-url').value = p.downloadUrl;
+          document.getElementById('form-payment-url').value = p.paymentUrl || '';
+        }
+      } else {
+        modalTitle.innerText = 'Add New Product';
+        document.getElementById('form-product-id').value = '';
+      }
+
+      openModal('modal-product-form');
+      lucide.createIcons();
+    }
+
+    function handleThumbnailUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        document.getElementById('form-thumbnail-url').value = evt.target.result;
+        showToast('Thumbnail uploaded locally!', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleSaveProduct(e) {
+      e.preventDefault();
+      const prodId = document.getElementById('form-product-id').value;
+      const title = document.getElementById('form-title').value;
+      const price = Number(document.getElementById('form-price').value);
+      const type = document.getElementById('form-type').value;
+      const category = document.getElementById('form-category').value;
+      const thumbnail = document.getElementById('form-thumbnail-url').value || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80';
+      const description = document.getElementById('form-description').value;
+      const downloadUrl = document.getElementById('form-download-url').value;
+      const paymentUrl = document.getElementById('form-payment-url').value;
+
+      if (prodId) {
+        // Update existing
+        const idx = AppState.products.findIndex(p => p.id === prodId);
+        if (idx > -1) {
+          AppState.products[idx] = {
+            ...AppState.products[idx],
+            title, price, type, category, thumbnail, description, downloadUrl, paymentUrl
+          };
+          showToast('Product updated successfully!', 'success');
+        }
+      } else {
+        // Add new
+        const newProd = {
+          id: 'prod-' + Date.now(),
+          title, price, type, category, thumbnail, description, downloadUrl, paymentUrl,
+          createdAt: Date.now()
+        };
+        AppState.products.unshift(newProd);
+        showToast('New product added to catalog!', 'success');
+      }
+
+      saveStateToLocalStorage();
+      closeModal('modal-product-form');
+      renderAll();
+    }
+
+    function deleteProduct(prodId) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        AppState.products = AppState.products.filter(p => p.id !== prodId);
+        saveStateToLocalStorage();
+        renderAll();
+        showToast('Product deleted', 'info');
+      }
+    }
+
+    function saveStoreSettings(e) {
+      e.preventDefault();
+      AppState.settings.upiId = document.getElementById('setting-upi-id').value;
+      AppState.settings.storeName = document.getElementById('setting-store-name').value;
+      AppState.settings.adminPassword = document.getElementById('setting-admin-pass').value;
+
+      saveStateToLocalStorage();
+      updateAppTitle();
+      showToast('Store settings saved!', 'success');
+    }
+
+    /* ================= BACKUP & JSON EXPORT/IMPORT ================= */
+    function exportDataJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(AppState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `digistore_backup_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Store data exported as JSON', 'success');
+    }
+
+    function importDataJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (parsed.products && Array.isArray(parsed.products)) {
+            AppState.products = parsed.products;
+            if (parsed.settings) AppState.settings = parsed.settings;
+            if (parsed.purchases) AppState.purchases = parsed.purchases;
+            saveStateToLocalStorage();
+            renderAll();
+            showToast('Store data restored successfully!', 'success');
+          } else {
+            showToast('Invalid JSON file format!', 'error');
+          }
+        } catch (err) {
+          showToast('Failed to parse JSON file', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetToSeedProducts() {
+      if (confirm('Reset store catalog to initial sample products? Custom products will be overwritten.')) {
+        AppState.products = DEFAULT_PRODUCTS;
+        saveStateToLocalStorage();
+        renderAll();
+        showToast('Catalog reset to sample products', 'info');
+      }
+    }
+
+    /* ================= BOTTOM NAV NAVIGATION ================= */
+    function switchTab(tabId) {
+      AppState.activeTab = tabId;
+
+      const views = ['shop', 'search', 'cart', 'favorites', 'purchases', 'admin'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.classList.add('hidden');
+
+        const navBtn = document.getElementById(`nav-btn-${v}`);
+        if (navBtn) {
+          navBtn.classList.remove('text-brand-600', 'dark:text-brand-400', 'font-bold');
+          navBtn.classList.add('text-slate-500', 'dark:text-slate-400');
+        }
+      });
+
+      const activeView = document.getElementById(`view-${tabId}`);
+      if (activeView) activeView.classList.remove('hidden');
+
+      const activeBtn = document.getElementById(`nav-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-500', 'dark:text-slate-400');
+        activeBtn.classList.add('text-brand-600', 'dark:text-brand-400', 'font-bold');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    /* ================= MODAL & TOAST HELPERS ================= */
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let bgClass = 'bg-slate-900 text-white';
+      if (type === 'success') bgClass = 'bg-emerald-600 text-white';
+      if (type === 'error') bgClass = 'bg-rose-600 text-white';
+
+      toast.className = `p-3 rounded-2xl ${bgClass} text-xs font-bold shadow-lg flex items-center justify-between toast-anim pointer-events-auto`;
+      toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" class="ml-2 text-white/80 hover:text-white">&times;</button>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentNode) toast.remove();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
